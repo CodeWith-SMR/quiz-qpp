@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Internet Quiz App - CodeWithSMR</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
+      padding: 20px;
+    }
+    .quiz-container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .question {
+      margin-top: 15px;
+    }
+    #quiz-timer {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      background: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Timer Display -->
+<div id="quiz-timer">⏰ <span id="timer-display">40:00</span></div>
+
+<div class="quiz-container">
+  <form id="quiz-form">
+    <h2>🌐 Internet Quiz App</h2>
+
+    <input type="text" id="student-name" placeholder="Student Name" required />
+    <input type="text" id="father-name" placeholder="Father Name" required />
+    <input type="text" id="roll-number" placeholder="Roll Number" required />
+    <input type="text" id="teacher-name" placeholder="Teacher Name" required />
+    <input type="text" id="course-name" placeholder="Course Name" required />
+    <input type="email" id="student-email" placeholder="Student Email" required />
+
+    <div class="question">
+      <p>1. What does ISP stand for?</p>
+      <label><input type="radio" name="q1" value="a" required /> Internet Server Protocol</label><br />
+      <label><input type="radio" name="q1" value="b" /> Internet Service Provider</label><br />
+      <label><input type="radio" name="q1" value="c" /> Internal Service Point</label><br />
+    </div>
+
+    <div class="question">
+      <p>2. What does DNS do?</p>
+      <label><input type="radio" name="q2" value="a" required /> Stores websites</label><br />
+      <label><input type="radio" name="q2" value="b" /> Converts names to IP addresses</label><br />
+      <label><input type="radio" name="q2" value="c" /> Increases internet speed</label><br />
+    </div>
+
+    <div class="question">
+      <p>3. What are data packets?</p>
+      <label><input type="radio" name="q3" value="a" required /> Entire web pages</label><br />
+      <label><input type="radio" name="q3" value="b" /> Small units of data sent over the internet</label><br />
+      <label><input type="radio" name="q3" value="c" /> WiFi signals</label><br />
+    </div>
+
+    <button type="submit">Submit Quiz</button>
+  </form>
+</div>
+
+<script>
+  let formSubmitted = false;
+  let timeLeft = 40 * 60; // ✅ 40 minutes in seconds (change this to 30 for 30 seconds)
+  let timerInterval;
+
+  window.onload = function () {
+    updateTimerDisplay(timeLeft);
+    timerInterval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (!formSubmitted) {
+          submitQuiz(); // Auto submit
+        }
+        return;
+      }
+      timeLeft--;
+      updateTimerDisplay(timeLeft);
+    }, 1000);
+  };
+
+  function updateTimerDisplay(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    document.getElementById("timer-display").textContent =
+      `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  document.getElementById("quiz-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    submitQuiz();
+  });
+
+  function submitQuiz() {
+    if (formSubmitted) return;
+    formSubmitted = true;
+    clearInterval(timerInterval);
+
+    const name = document.getElementById("student-name").value;
+    const fname = document.getElementById("father-name").value;
+    const roll = document.getElementById("roll-number").value;
+    const teacher = document.getElementById("teacher-name").value;
+    const course = document.getElementById("course-name").value;
+    const email = document.getElementById("student-email").value;
+
+    let score = 0;
+    const total = 3;
+    const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+    const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+    const q3 = document.querySelector('input[name="q3"]:checked')?.value;
+
+    if (q1 === "b") score++;
+    if (q2 === "b") score++;
+    if (q3 === "b") score++;
+
+    const result = score >= 2 ? "PASS" : "FAIL";
+    const percentage = Math.round((score / total) * 100);
+
+    const message = `
+👨‍🎓 Student Name: ${name}
+👨‍👦 Father Name: ${fname}
+🔢 Roll Number: ${roll}
+👨‍🏫 Teacher: ${teacher}
+📚 Course: ${course}
+📩 Email: ${email}
+
+📋 Quiz Result: ${result}
+✅ Marks: ${score}/${total}
+📊 Percentage: ${percentage}%
+`;
+
+    const formData = new FormData();
+    formData.append("access_key", "7071f82d-0c8e-42d2-8af0-6eab61e5163c");
+    formData.append("email", "codewithsmr@gmail.com");
+    formData.append("subject", "New Quiz Submission");
+    formData.append("message", message);
+
+    const request = new XMLHttpRequest();
+    request.open("POST", "https://api.web3forms.com/submit", true);
+    request.onreadystatechange = function () {
+      if (request.readyState === XMLHttpRequest.DONE) {
+        if (request.status === 200) {
+          sendThankYouMessage(email);
+        } else {
+          alert("❌ Submission failed.");
+        }
+      }
+    };
+    request.send(formData);
+  }
+
+  function sendThankYouMessage(studentEmail) {
+    const formData = new FormData();
+    formData.append("access_key", "7071f82d-0c8e-42d2-8af0-6eab61e5163c");
+    formData.append("email", studentEmail);
+    formData.append("subject", "Quiz Submitted Successfully!");
+    formData.append("message", "🎉 Thank you! Your quiz has been submitted successfully.");
+
+    const request = new XMLHttpRequest();
+    request.open("POST", "https://api.web3forms.com/submit", true);
+    request.onreadystatechange = function () {
+      if (request.readyState === XMLHttpRequest.DONE) {
+        document.body.innerHTML = ""; // Clear page
+        alert("✅ Quiz submitted successfully!");
+      }
+    };
+    request.send(formData);
+  }
+</script>
+</body>
+</html>
